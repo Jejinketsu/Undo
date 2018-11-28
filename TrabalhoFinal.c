@@ -8,7 +8,7 @@ typedef struct {
     int undo;
 }Entrada;
 
-Entrada comandos[100];
+Entrada comandos[1000];
 
 void recarregar(const char *filePath );
 void checkPath(FILE *file);
@@ -19,7 +19,7 @@ char linhas[60];
 int main (int argc, const char *argv[]){
     
     recarregar(argv[1]);
-    printf("Comando | T | U | Time\n");
+    printf("Comando | T   |   U |   Time\n");
     for(int i = 0; i < 100;i++){
         printf("Comando | %3c | %3d | %3d\n", comandos[i].type, comandos[i].undo, comandos[i].tempo);
     }
@@ -40,30 +40,39 @@ void recarregar(const char * filePath){
 
     while(!feof(file)){ //percorre todo o arquivo
     	
-    	int i = 0;
+    	int i = 0, testeVirgula;
     	
-        fgets(linhas,60,file);  //O vetor linhas recebe o conteudo dos arquivo
+        fgets(linhas,5000,file);  //O vetor linhas recebe o conteudo dos arquivo
         
         while(linhas[i]!='}'){
         	
         	if(linhas[i+1] == 't'){ 				//se o primeiro caractere for igual a t, 
         		comandos[cont_type].type = linhas[i+6];	//a struct comandos.tipo recebe o que estiver no vetor linhas 6 casas depois
-        		i+=7;
-        		cont_type++;	
+        		i+=7; cont_type++;	
 			}
             else if(linhas[i+1] == 'u'){ 				//se o primeiro caractere for igual a t, 
-        		comandos[cont_type].undo = atoi(&linhas[i+6]);	//a struct comandos.tipo recebe o que estiver no vetor linhas 6 casas depois
-        		i+=7;
-        		cont_type++;	
+                char segundo[256];
+                i++; testeVirgula = 6;
+                while(linhas[i]!='}' || linhas[i]!=','){
+                    if(linhas[i+testeVirgula] == ',' || linhas[i+testeVirgula] == '}'){
+                        comandos[cont_type].undo =  slice(linhas,segundo,i+5,i+testeVirgula-1);
+                        cont_type++;
+                        i+=testeVirgula; testeVirgula = 6;
+                    } else {
+                        testeVirgula++;
+                    }
+                    if(linhas[i]=='}') break;
+                }
+                //cont_type++;
 			}
         }
-        i += 2; //Posicionando cursor para coletar os tempos. 
-        int testeVirgula = 2;
+        i +=2; //Posicionando cursor para coletar os tempos.  
+        testeVirgula = 2;
         while(linhas[i]!='}'){
             char segundo[256];
             if(linhas[i+testeVirgula] == ',' || linhas[i+testeVirgula] == '}'){
                 comandos[cont_tempo].tempo =  slice(linhas,segundo,i+1,i+testeVirgula-1);
-                i+=testeVirgula; cont_tempo++;
+                i+=testeVirgula; cont_tempo++; testeVirgula = 2;
             } else {
                 testeVirgula++;
             }
