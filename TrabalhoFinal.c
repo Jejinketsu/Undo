@@ -8,18 +8,17 @@ typedef struct {
     int undo;
 }Entrada;
 
-Entrada comandos[1000];
-
 void recarregar(const char *filePath );
 void checkPath(FILE *file);
 int slice(const char * str, char * buffer, size_t start, size_t end);
 
-char linhas[60];
+Entrada comandos[1000];
+char linhas[60000];
 
 int main (int argc, const char *argv[]){
     
     recarregar(argv[1]);
-    printf("Comando | T   |   U |   Time\n");
+    printf("Comando |   T |   U |   Time\n");
     for(int i = 0; i < 100;i++){
         printf("Comando | %3c | %3d | %3d\n", comandos[i].type, comandos[i].undo, comandos[i].tempo);
     }
@@ -31,8 +30,7 @@ void recarregar(const char * filePath){
     FILE *file;
     file = fopen(filePath, "r");//leitura do arquivo de entrada
 
-    int cont_type = 0; //contador de caracteres
-    //int cont_undo = 0; //contador de undos
+    int cont_type = 0; //contador de posições do vetor de comandos
     int cont_tempo = 0; //pegador de tempos
     char numero;
 
