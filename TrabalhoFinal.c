@@ -10,24 +10,34 @@ typedef struct {
 
 Entrada comandos[100];
 
-//void recarregar(Comando *comandos, const char *filePath );
+void recarregar(const char *filePath );
 void checkPath(FILE *file);
+int slice(const char * str, char * buffer, size_t start, size_t end);
 
 char linhas[60];
-//char letras[60];
 
 int main (int argc, const char *argv[]){
     
-    int cont = 0;
-    
-    FILE *file;
-    file = fopen("entrada.txt", "r"); //leitura do arquivo de entrada
+    recarregar(argv[1]);
+    printf("Comando | T | U | Time\n");
+    for(int i = 0; i < 100;i++){
+        printf("Comando | %3c | %3d | %3d\n", comandos[i].type, comandos[i].undo, comandos[i].tempo);
+    }
 
-    checkPath(file);//checagem se o arquivo é NULL
-    
+    return 0;
+}
+
+void recarregar(const char * filePath){
+    FILE *file;
+    file = fopen(filePath, "r");//leitura do arquivo de entrada
+
     int cont_type = 0; //contador de caracteres
-    int cont_undo = 0;	//contador de undos
+    //int cont_undo = 0; //contador de undos
+    int cont_tempo = 0; //pegador de tempos
     char numero;
+
+    checkPath(file);
+
     while(!feof(file)){ //percorre todo o arquivo
     	
     	int i = 0;
@@ -41,39 +51,40 @@ int main (int argc, const char *argv[]){
         		i+=7;
         		cont_type++;	
 			}
-		}
+            else if(linhas[i+1] == 'u'){ 				//se o primeiro caractere for igual a t, 
+        		comandos[cont_type].undo = atoi(&linhas[i+6]);	//a struct comandos.tipo recebe o que estiver no vetor linhas 6 casas depois
+        		i+=7;
+        		cont_type++;	
+			}
+        }
+        i += 2; //Posicionando cursor para coletar os tempos. 
+        int testeVirgula = 2;
+        while(linhas[i]!='}'){
+            char segundo[256];
+            if(linhas[i+testeVirgula] == ',' || linhas[i+testeVirgula] == '}'){
+                comandos[cont_tempo].tempo =  slice(linhas,segundo,i+1,i+testeVirgula-1);
+                i+=testeVirgula; cont_tempo++;
+            } else {
+                testeVirgula++;
+            }
+        }
     }
-    for(int i = 0; i<cont_type; i++)
-    	printf("%c",comandos[4].type);
 
     fclose(file);
-    
-    //recarregar(comandos, argv[1]);
-
-    return 0;
 }
-
-/*void recarregar(Comando *comandos, const char * filePath){
-    int i =0;
-    FILE *file;
-    file = fopen(filePath, "r");
-    
-    char linhas[30][60];
-
-    checkPath(file);
-
-    while(!feof(file)){
-        fgets(linhas[i],60,file);
-        printf("%s\n",linhas[i]);
-        i++;
-    }
-
-    fclose(file);
-}*/
 
 void checkPath(FILE *file){
     if(file == NULL){
         printf("Erro na abertura de arquivo!\n");
         exit(1);        
     }
+}
+
+int slice(const char * str, char * buffer, size_t start, size_t end) {
+    size_t j = 0;
+    for ( size_t i = start; i <= end; ++i ) {
+        buffer[j++] = str[i];
+    }
+    buffer[j] = 0;
+    return atoi(buffer);
 }
