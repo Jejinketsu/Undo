@@ -9,7 +9,7 @@ typedef struct {
 }Entrada;
 
 void recarregar(const char *filePath);
-void escrever(int inicio, int fim,char palavra[]);
+void escrever(int inicio, int fim);
 void checkPath(FILE *file);
 int slice(const char * str, char * buffer, size_t start, size_t end);
 
@@ -30,7 +30,7 @@ int main (int argc, const char *argv[]){
         }
     }
 
-    printf("%s\n", palavra);
+    //printf("%s\n", palavra);
 
     return 0;
 }
@@ -87,14 +87,35 @@ void recarregar(const char * filePath){
             }
 
         }
-        //escrever(cont_mark, cont_type,palavra);
+        escrever(cont_mark, cont_type-1);
     }
 
     fclose(file);
 }
 
-void escrever(int inicio, int fim, char palavra[]){
-
+void escrever(int inicio, int fim){
+    char palavra[6000]; int contP = 0, contRemove = 0;
+    //printf("type %c undo %d time %d\n", comandos[inicio].type, comandos[inicio].undo, comandos[inicio].tempo);
+    for(int i = fim; i >= inicio; i--){
+        if(comandos[i].undo != 0){
+            while(comandos[i].undo > 0){
+                comandos[i].tempo--;
+                if(comandos[i].tempo == comandos[i-contRemove-1].tempo){
+                    contRemove++;
+                }
+                comandos[i].undo--;
+            }
+            i = i-contRemove;
+        } else {
+            palavra[contP] = comandos[i].type;
+            contP++;
+        }
+    }
+    palavra[contP] = '\0';
+    for(int i = contP; i >= 0; i--){
+        printf("%c", palavra[i]);
+    }
+    printf("\n");
 }
 
 void checkPath(FILE *file){
