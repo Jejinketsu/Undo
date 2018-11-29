@@ -8,8 +8,8 @@ typedef struct {
     int undo;
 }Entrada;
 
-void recarregar(const char *filePath);
-void escrever(int inicio, int fim);
+void recarregar(const char *filePath, FILE *fileOut);
+void escrever(int inicio, int fim, FILE *fileOut);
 void checkPath(FILE *file);
 int slice(const char * str, char * buffer, size_t start, size_t end);
 
@@ -17,17 +17,18 @@ Entrada comandos[1000];
 char linhas[60000];
 
 int main (int argc, const char *argv[]){
-    
-    recarregar(argv[1]);
+
+    FILE *fileOut;
+    fileOut = fopen(argv[2], "w");
+
+    recarregar(argv[1], fileOut);
+
+    fclose(fileOut);
 
     char palavra[600]; int contP = 0;
     //printf("Comando |   T |   U |   Time\n");
     for(int i = 0; i < 100;i++){
         //printf("Comando | %3c | %3d | %3d\n", comandos[i].type, comandos[i].undo, comandos[i].tempo);
-        if(comandos[i].undo == 0) {
-            palavra[contP] = comandos[i].type; 
-            contP++;
-        }
     }
 
     //printf("%s\n", palavra);
@@ -35,7 +36,7 @@ int main (int argc, const char *argv[]){
     return 0;
 }
 
-void recarregar(const char * filePath){
+void recarregar(const char * filePath, FILE * fileOut){
     FILE *file;
     file = fopen(filePath, "r"); //leitura do arquivo de entrada
 
@@ -87,15 +88,19 @@ void recarregar(const char * filePath){
             }
 
         }
-        escrever(cont_mark, cont_type-1);
+        escrever(cont_mark, cont_type-1, fileOut);
     }
 
     fclose(file);
 }
 
-void escrever(int inicio, int fim){
-    char palavra[6000]; int contP = 0, contRemove = 0;
-    //printf("type %c undo %d time %d\n", comandos[inicio].type, comandos[inicio].undo, comandos[inicio].tempo);
+void escrever(int inicio, int fim, FILE *fileOut){
+    char palavra[500]; int contP = 0, contRemove = 0;
+
+    for(int i = 0; i < 500; i++){
+        palavra[i] = '\0';
+    }
+
     for(int i = fim; i >= inicio; i--){
         if(comandos[i].undo != 0){
             while(comandos[i].undo > 0){
@@ -112,10 +117,10 @@ void escrever(int inicio, int fim){
         }
     }
     palavra[contP] = '\0';
-    for(int i = contP; i >= 0; i--){
-        printf("%c", palavra[i]);
+    for(int i = contP-1; i >= 0; i--){
+        fputc(palavra[i], fileOut);
     }
-    printf("\n");
+    fputc('\n', fileOut);
 }
 
 void checkPath(FILE *file){

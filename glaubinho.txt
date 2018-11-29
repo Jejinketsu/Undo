@@ -1,5 +1,5 @@
 {type b,type b,type c,undo 3},{1,2,3,5}
 {type a,type k,undo 1},{1,2,3}
 {type j,undo 1,undo 1},{1,2,3}
-{type d,type e,type t,undo 10},{1,2,3,1000}
 {undo 1},{1}
+{type d,type e,type t,undo 10},{1,2,3,1000}
