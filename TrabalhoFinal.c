@@ -8,7 +8,8 @@ typedef struct {
     int undo;
 }Entrada;
 
-void recarregar(const char *filePath );
+void recarregar(const char *filePath);
+void escrever(int inicio, int fim,char palavra[]);
 void checkPath(FILE *file);
 int slice(const char * str, char * buffer, size_t start, size_t end);
 
@@ -18,39 +19,48 @@ char linhas[60000];
 int main (int argc, const char *argv[]){
     
     recarregar(argv[1]);
-    printf("Comando |   T |   U |   Time\n");
+
+    char palavra[600]; int contP = 0;
+    //printf("Comando |   T |   U |   Time\n");
     for(int i = 0; i < 100;i++){
-        printf("Comando | %3c | %3d | %3d\n", comandos[i].type, comandos[i].undo, comandos[i].tempo);
+        //printf("Comando | %3c | %3d | %3d\n", comandos[i].type, comandos[i].undo, comandos[i].tempo);
+        if(comandos[i].undo == 0) {
+            palavra[contP] = comandos[i].type; 
+            contP++;
+        }
     }
+
+    printf("%s\n", palavra);
 
     return 0;
 }
 
 void recarregar(const char * filePath){
     FILE *file;
-    file = fopen(filePath, "r");//leitura do arquivo de entrada
+    file = fopen(filePath, "r"); //leitura do arquivo de entrada
 
+    int cont_mark = 0; //marca a posição onde o cont_type deixou o cursor depois de ler uma linha
     int cont_type = 0; //contador de posições do vetor de comandos
-    int cont_tempo = 0; //pegador de tempos
-    char numero;
+    int cont_tempo = 0;//marcador de tempos
 
     checkPath(file);
 
-    while(!feof(file)){ //percorre todo o arquivo
-    	
+    while(!feof(file)){
+    	cont_mark = cont_type;
     	int i = 0, testeVirgula;
     	
-        fgets(linhas,5000,file);  //O vetor linhas recebe o conteudo dos arquivo
-        
+        fgets(linhas,5000,file);                        //O vetor linhas recebe o conteudo dos arquivo
         while(linhas[i]!='}'){
-        	
-        	if(linhas[i+1] == 't'){ 				//se o primeiro caractere for igual a t, 
-        		comandos[cont_type].type = linhas[i+6];	//a struct comandos.tipo recebe o que estiver no vetor linhas 6 casas depois
-        		i+=7; cont_type++;	
+
+        	if(linhas[i+1] == 't'){ 				    //se o primeiro caractere for igual a t, 
+        		comandos[cont_type].type = linhas[i+6];	//a struct comandos.type recebe o que estiver no vetor linhas 6 casas depois
+        		i+=7; cont_type++;
 			}
-            else if(linhas[i+1] == 'u'){ 				//se o primeiro caractere for igual a t, 
-                char segundo[256];
+
+            else if(linhas[i+1] == 'u'){ 				//se o primeiro caractere for igual a u,
+                char segundo[256];                      //o valor numérico do undo será armazenado em comandos.undo
                 i++; testeVirgula = 6;
+
                 while(linhas[i]!='}' || linhas[i]!=','){
                     if(linhas[i+testeVirgula] == ',' || linhas[i+testeVirgula] == '}'){
                         comandos[cont_type].undo =  slice(linhas,segundo,i+5,i+testeVirgula-1);
@@ -59,25 +69,32 @@ void recarregar(const char * filePath){
                     } else {
                         testeVirgula++;
                     }
-                    if(linhas[i]=='}') break;
+                    if(linhas[i]=='}' || linhas[i+1] == 't') break;
                 }
-                //cont_type++;
+
 			}
+            
         }
-        i +=2; //Posicionando cursor para coletar os tempos.  
-        testeVirgula = 2;
+        i +=2; testeVirgula = 2;  //Posicionando cursor para coletar os tempos. Teste virgula irá ajudar a determinar quantas casas têm o número do undo.  
         while(linhas[i]!='}'){
             char segundo[256];
+
             if(linhas[i+testeVirgula] == ',' || linhas[i+testeVirgula] == '}'){
                 comandos[cont_tempo].tempo =  slice(linhas,segundo,i+1,i+testeVirgula-1);
                 i+=testeVirgula; cont_tempo++; testeVirgula = 2;
             } else {
                 testeVirgula++;
             }
+
         }
+        //escrever(cont_mark, cont_type,palavra);
     }
 
     fclose(file);
+}
+
+void escrever(int inicio, int fim, char palavra[]){
+
 }
 
 void checkPath(FILE *file){
