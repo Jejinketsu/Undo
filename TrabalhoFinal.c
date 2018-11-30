@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+//Variáveis de Desempenho
+int NUM_CHAR = 0, NUM_TYPE = 0, NUM_UNDO = 0;
+int NUM_VIRG = 0, NUM_VIRG2 = 0, NUM_TIME = 0; 
+
 typedef struct {
     int tempo;
     char type;
@@ -22,16 +26,8 @@ int main (int argc, const char *argv[]){
     fileOut = fopen(argv[2], "w");
 
     recarregar(argv[1], fileOut);
-
+    
     fclose(fileOut);
-
-    char palavra[600]; int contP = 0;
-    //printf("Comando |   T |   U |   Time\n");
-    for(int i = 0; i < 100;i++){
-        //printf("Comando | %3c | %3d | %3d\n", comandos[i].type, comandos[i].undo, comandos[i].tempo);
-    }
-
-    //printf("%s\n", palavra);
 
     return 0;
 }
@@ -101,21 +97,18 @@ void escrever(int inicio, int fim, FILE *fileOut){
         palavra[i] = '\0';
     }
 
+    //O valor de continuação é o tempo do comando menos o tempo do Undo
+    int continuacao = 1000000001; //Inicialmente terá um valor além do valor máximo dos testes (10^9)+1
     for(int i = fim; i >= inicio; i--){
-        if(comandos[i].undo != 0){
-            while(comandos[i].undo > 0){
-                comandos[i].tempo--;
-                if(comandos[i].tempo == comandos[i-contRemove-1].tempo){
-                    contRemove++;
-                }
-                comandos[i].undo--;
-            }
-            i = i-contRemove;
+        if(comandos[i].tempo >= continuacao) continue; // Se o tempo do comando for maior ou igual a continuacao, o comando é ignorado
+        if(comandos[i].undo != 0){ // verifica se o comando é um type ou um undo
+            continuacao = comandos[i].tempo - comandos[i].undo; //calcula um novo valor de continuidade
         } else {
-            palavra[contP] = comandos[i].type;
+            palavra[contP] = comandos[i].type; //escreve o caractere no vetor
             contP++;
         }
     }
+
     palavra[contP] = '\0';
     for(int i = contP-1; i >= 0; i--){
         fputc(palavra[i], fileOut);
