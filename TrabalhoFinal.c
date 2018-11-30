@@ -3,8 +3,6 @@
 #include <string.h>
 
 //Variáveis de Desempenho
-int NUM_CHAR = 0, NUM_TYPE = 0, NUM_UNDO = 0;
-int NUM_VIRG = 0, NUM_VIRG2 = 0, NUM_TIME = 0; 
 
 typedef struct {
     int tempo;
@@ -91,11 +89,7 @@ void recarregar(const char * filePath, FILE * fileOut){
 }
 
 void escrever(int inicio, int fim, FILE *fileOut){
-    char palavra[500]; int contP = 0, contRemove = 0;
-
-    for(int i = 0; i < 500; i++){
-        palavra[i] = '\0';
-    }
+    char palavra[5000]; int contP = 0, contRemove = 0;
 
     //O valor de continuação é o tempo do comando menos o tempo do Undo
     int continuacao = 1000000001; //Inicialmente terá um valor além do valor máximo dos testes (10^9)+1
